@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="dz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>མིང་ཚིག་གི་ཁྲོམ། - Spelling Bazaar</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Uchen&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    body { 
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow-y: scroll;
+    }
+    .dzongkha {
+      font-family: 'Uchen', 'Inter', sans-serif;
+      font-size: 1.72rem;
+      line-height: 1.5;
+    }
+    #world {
+      background-image: url("images/background.png");
+      background-size: cover;
+      background-repeat: repeat-x;
+      animation: moveBg 400s linear infinite;
+      overflow: hidden;
+    }
+    @keyframes moveBg {
+      0% { background-position: 0 0; }
+      100% { background-position: -1000px 0; }
+    }
+    .level2-bg {
+      background-image: url("images/background2.png") !important;
+      background-size: cover;
+      background-repeat: no-repeat;
+      animation: none !important;
+    }
+    .level4-bg {
+      background-image: url("images/background4.png") !important;
+      background-size: cover;
+      background-repeat: no-repeat;
+      animation: none !important;
+    }
+    .buyer-sprite { position: absolute; bottom: 20px; left: 15%; z-index: 300; transition: left 1.5s ease-in-out; cursor: pointer; }
+    .shopkeeper-sprite { position: absolute; bottom: 5px; right: 20%; z-index: 300; }
+    .walking { animation: walkBounce 0.5s ease-in-out infinite; }
+    @keyframes walkBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    .reward { position: absolute; font-size: 3rem; animation: flyUp 1.8s ease-out forwards; z-index: 500; }
+    @keyframes flyUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-200px); opacity: 0; } }
+    .fade-out { animation: fadeOut 1s ease forwards; }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; visibility: hidden; } }
+    .bubble { position: absolute; bottom: 300px; background: white; padding: 20px; border-radius: 20px; width: 280px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 4px solid #ff9f1c; z-index: 400; }
+    #shop-bubble { bottom: 360px; left: -60px; }
+
+    /* Smooth Zoom Animation for Intro Screen */
+    #introContent {
+      animation: introZoom 1.2s ease-out forwards;
+    }
+    @keyframes introZoom {
+      from { transform: scale(0.75); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-[#fff8e1] to-[#ffe4c4] text-slate-800">
+
+  <!-- ==================== INTRO SCREEN WITH SMOOTH ZOOM (ENGLISH) ==================== -->
+  <div id="introScreen" class="fixed inset-0 bg-gradient-to-br from-[#1e2937] to-[#334155] flex items-center justify-center z-[2000] overflow-hidden">
+    <div id="introContent" class="bg-white text-slate-800 max-w-2xl w-full mx-4 rounded-3xl shadow-2xl p-12 text-center">
+      <div class="text-8xl mb-8">🇧🇹</div>
+      <h1 class="text-5xl font-bold text-[#ff6b00] mb-3">Spelling Bazaar</h1>
+      <p class="text-3xl text-[#ff9f1c] mb-10">Dzongkha Spelling Learning Game</p>
+
+      <div class="text-left mx-auto max-w-lg space-y-6 text-slate-700 text-xl">
+        <p><strong>Developed by:</strong> Thinley Wangchuk</p>
+        <p><strong>Created for:</strong> Class 9 Students</p>
+        <p><strong>Purpose:</strong> This game helps students learn correct Dzongkha spellings and vocabularies through fun and interactive gameplay.</p>
+        <p class="text-lg text-slate-600">
+          Designed to make learning Dzongkha spelling enjoyable for students while improving their language skills.</p>
+        <p The developer aims to improve in future.
+        </p>
+      </div>
+
+      <button onclick="startFromIntro()" 
+              class="mt-12 w-full bg-gradient-to-r from-[#ff9f1c] to-[#f76c6f] text-white py-6 rounded-3xl text-3xl font-bold shadow-lg hover:scale-105 transition">
+        Continue
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== STORY SCREEN (ENGLISH) ==================== -->
+  <div id="storyScreen" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[1500]">
+    <div class="bg-white text-slate-800 max-w-2xl w-full mx-4 rounded-3xl shadow-2xl p-12 text-center">
+      <div class="text-7xl mb-8">🇧🇹</div>
+      <h2 class="text-4xl font-bold text-[#ff6b00] mb-8">The Young Trader's Dream</h2>
+      
+      <p class="text-2xl leading-relaxed text-slate-700 mb-12">
+        "In the bustling bazaar of Bhutan, a young boy dreams of becoming the greatest trader in the kingdom.<br><br>
+        To succeed, he must master the correct Dzongkha spellings and words".<br><br>
+        Join him on this fun learning journey through the Spelling Bazaar!
+      </p>
+
+      <button onclick="startStoryToLevel1()" 
+              class="w-full bg-gradient-to-r from-[#ff9f1c] to-[#f76c6f] text-white py-6 rounded-3xl text-3xl font-bold shadow-lg hover:scale-105 transition">
+        Continue to Level 1
+      </button>
+    </div>
+  </div>
+
+  <!-- Welcome Screen -->
+  <div id="welcome" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[999]">
+    <div class="bg-white text-slate-800 p-12 rounded-3xl max-w-md w-full text-center shadow-2xl">
+      <h2 class="dzongkha text-5xl font-bold mb-6 text-[#ff6b00]">བྱོན་པ་ལེགས་སོ།།</h2>
+      <p class="dzongkha text-2xl mb-10">དག་ཡིག་སློབ་སྦྱོང་གི་རྩེདམོ། <br> Spelling Learning Game!</p>
+      <button onclick="startGame()" class="dzongkha bg-gradient-to-r from-[#ff9f1c] to-[#f76c6f] text-white px-8 py-4 rounded-3xl text-2xl font-bold">འགོ་བཙུགས་</button>
+    </div>
+  </div>
+
+  <!-- Level Intros -->
+  <div id="level1Intro" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[400]">
+    <div class="bg-white text-slate-800 p-12 rounded-3xl max-w-md w-full text-center shadow-2xl">
+      <div class="text-6xl mb-6">🎤</div>
+      <h2 class="dzongkha text-4xl font-bold mb-4 text-[#ff6b00]">གནས་རིམ་དང་པ།</h2>
+      <h3 class="dzongkha text-2xl mb-6 text-[#ff9f1c]">Level 1 - སྒྲ་གཟུང་ཉན་ཏེ་ཡིག་སྡེབ་བལྟ་ནི།</h3>
+      <div class="text-left space-y-5 mb-10 text-slate-700">
+        <p class="dzongkha text-lg">༡ ཚོང་པ་གིས་ སྒྲ་གཟུང་ནང་སྦེ་ དྲི་བ་འདྲི་འོང་།</p>
+        <p class="dzongkha text-lg">༢ སྒྲ་ཉན་ཏེ་གོ་བ་ཤེས་དགོ། དེ་ལས་ དྲི་བའི་ལན་གདམ་ཁ་རྐྱབ།</p>
+        <p class="dzongkha text-lg">༣ དྲི་བ་གསུམ་ཆ་རའི་ལན་ཕོག་པ་ཅིན་ གནས་རིམ་གཉིས་པ་ན་འགྱོ་ཆོག</p>
+      </div>
+      <button onclick="startLevel1()" class="w-full bg-gradient-to-r from-[#ff9f1c] to-[#f76c6f] text-white py-4 rounded-3xl dzongkha text-2xl font-bold">འགོ་བཙུགས། Start Level 1 ➡️</button>
+    </div>
+  </div>
+
+  <div id="level2Intro" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[400]">
+    <div class="bg-white text-slate-800 p-12 rounded-3xl max-w-md w-full text-center shadow-2xl">
+      <div class="text-6xl mb-6">🔍</div>
+      <h2 class="dzongkha text-4xl font-bold mb-4 text-[#ff6b00]">གནས་རིམ་གཉིས་པ།</h2>
+      <h3 class="dzongkha text-2xl mb-6 text-[#ff9f1c]">Level 2 - ཅ་ལ་འཚོལ་ཏེ་ དེའི་སྐོར་ལས་ལྷབ་ནི།</h3>
+      <div class="text-left space-y-4 mb-8 text-slate-700">
+        <p class="dzongkha text-lg">༡ སྒྲོམ་གསུམ་ཡོད། སྒྲོམ་རེ་རེ་ནང་ལུ་ ཅ་ལ་རེ་ཡོད་མི་འདི་ འཚོལ་དགོ།</p>
+        <p class="dzongkha text-lg">༢ ཅ་ལ་འདི་ཐོབ་ཞིནམ་ལས་ ཅ་ལ་གི་སྐོར་ལས་ཤེས་བཞིན་ན་ དྲི་བའི་ལན་རྐྱབ་དགོ།</p>
+      </div>
+      <button onclick="startLevel2()" class="w-full bg-gradient-to-r from-[#ff9f1c] to-[#f76c6f] text-white py-4 rounded-3xl dzongkha text-2xl font-bold">འཕྲོ་མཐུད་འཚོལ་ནི་འགོ་བཙུགས། ➡️</button>
+    </div>
+  </div>
+
+  <div id="level3Intro" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[400]">
+    <div class="bg-white text-slate-800 p-12 rounded-3xl max-w-md w-full text-center shadow-2xl">
+      <div class="text-6xl mb-6">📝</div>
+      <h2 class="dzongkha text-4xl font-bold mb-4 text-[#ff6b00]">གནས་རིམ་གསུམ་པ།</h2>
+      <h3 class="dzongkha text-2xl mb-6 text-[#ff9f1c]">Level 3 Learning Verbs - ལཱ་འབད་ཐངས་བལྟ་སྟེ་མིང་ཚིག་ལྷབ་ནི།</h3>
+      <div class="text-left space-y-5 mb-10 text-slate-700">
+        <p class="dzongkha text-lg">༡ པར་དང་གློག་ཐུང་ནང་ ག་ཅི་འབད་དེ་ག་ ལེགས་ཤོམ་སྦེ་བལྟ་དགོ།</p>
+        <p class="dzongkha text-lg">༢ དེ་ལས་ཚོང་པ་(སློབ་དཔོན་གྱིས་དྲི་བ་དང་ལམ་སྟོན་གནང་འོང་།</p>
+        <p class="dzongkha text-lg">༣ ཁྱོད་ཀྱིས་དྲི་བའི་ལན་ཡིག་ཐོག་ལུ་བྲི་དགོ།</p>
+      </div>
+      <button onclick="startLevel3()" class="w-full bg-gradient-to-r from-[#ff9f1c] to-[#f76c6f] text-white py-4 rounded-3xl dzongkha text-2xl font-bold">འགོ་བཙུགས། ➡️</button>
+    </div>
+  </div>
+
+  <div id="level4Intro" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[400]">
+    <div class="bg-white text-slate-800 p-12 rounded-3xl max-w-md w-full text-center shadow-2xl">
+      <div class="text-6xl mb-6">📊</div>
+      <h2 class="dzongkha text-4xl font-bold mb-4 text-[#8b5cf6]">ཁྱོད་ཀྱིས་ག་དེམ་ཅིག་ཤེས་ནུག་ག་བལྟ།</h2>
+      <h3 class="dzongkha text-2xl mb-6 text-violet-600">Self Assessment - རང་ཉིད་དབྱེ་ཞིབ་འབད།</h3>
+      <div class="text-left space-y-5 mb-10 text-slate-700">
+        <p class="dzongkha text-lg">༡ དྲི་བ་༡༠ ཡོད།</p>
+        <p class="dzongkha text-lg">༢ ཁྱོད་ར་གིས་ ག་དེམ་ཅིག་ཤེས་པས་ག་བལྟ།</p>
+        <p class="dzongkha text-lg">༣ དྲི་བ་རེ་ལུ་ སྐུགས་༡༠རེ་འཐོབ།</p>
+      </div>
+      <button onclick="startLevel4()" class="w-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white py-4 rounded-3xl dzongkha text-2xl font-bold">དབྱེ་ཞིབ་འགོ་བཙུགས། Start Assessment ➡️</button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="fixed top-0 w-full p-3 flex justify-between items-center z-[100] bg-black/50 shadow-md border-b border-yellow-400">
+    <div class="flex items-center space-x-4">
+      <img src="images/logo.png" alt="Game Logo" class="h-10 md:h-12 lg:h-16">
+    </div>
+    <div class="flex items-center gap-4 transform scale-75 md:scale-100">
+      <div class="flex items-center gap-2 bg-white/90 px-3 py-2 rounded-2xl shadow border border-[#ff9f1c]/30">
+        <span class="text-2xl">❤️</span>
+        <span id="lives" class="font-bold text-2xl text-[#f76c6f]">3</span>
+      </div>
+      <div class="bg-white/90 px-4 py-2 rounded-2xl shadow border border-[#ff9f1c]/30 text-center">
+        <span class="text-[#ff9f1c] font-bold text-2xl" id="score">0</span>
+        <span class="dzongkha text-xs block text-[#f76c6f] -mt-1 font-medium">སྐུགས།</span>
+      </div>
+      <div class="bg-white/90 px-3 py-1 rounded-2xl text-sm font-bold text-[#ff6b00]" id="level">Level 1</div>
+      <button onclick="toggleMusic()" id="musicBtn" class="bg-white px-2 py-1 rounded-2xl shadow text-lg">🎵</button>
+    </div>
+  </div>
+
+  <!-- Game World -->
+  <div id="world" class="relative h-screen w-full">
+    <div id="player" class="buyer-sprite" onclick="startQuest()">
+      <img src="images/boy.png" class="w-48" alt="Boy">
+      <div id="boy-bubble" class="bubble hidden"><p id="boy-text" class="dzongkha text-xl text-center"></p></div>
+    </div>
+    <div id="shopkeeper" class="shopkeeper-sprite">
+      <img src="images/shopkeeper.png" class="w-24 md:w-40 lg:w-48" alt="Shopkeeper">
+      <div id="shop-bubble" class="bubble hidden"><p id="shop-text" class="dzongkha text-xl text-center"></p></div>
+    </div>
+    <div id="searchBoxes" class="hidden">
+      <img src="images/box1.png" onclick="startSearch(1)" class="absolute bottom-32 left-[20%] w-32 md:w-48 lg:w-56" alt="Box 1">
+      <img src="images/box2.png" onclick="startSearch(2)" class="absolute bottom-40 left-[45%] w-32 md:w-48 lg:w-56" alt="Box 2">
+      <img src="images/box3.png" onclick="startSearch(3)" class="absolute bottom-32 left-[55%] w-32 md:w-48 lg:w-56" alt="Box 3">
+    </div>
+    <button id="nextBtn" onclick="nextAction()" class="fixed bottom-4 right-4 bg-[#ff6b00] text-white px-6 py-3 rounded-lg dzongkha text-sm font-bold shadow-md z-[1100] hover:scale-105 transition-transform">
+      འཕྲོ་མཐུད། Next ➡️
+    </button>
+  </div>
+
+  <!-- Normal Complete Screen -->
+  <div id="normalComplete" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[400]">
+    <div class="bg-white text-slate-800 p-12 rounded-3xl max-w-md w-full text-center shadow-2xl">
+      <div class="text-6xl mb-6">🎉</div>
+      <h2 id="normal-title" class="dzongkha text-4xl font-bold mb-4 text-[#ff6b00]">བཀྲིས་བདེ་ལེགས། གནས་རིམ་རྫོགས་སོ།།</h2>
+      <p class="dzongkha text-2xl mb-6">You scored <span id="normal-score" class="font-bold text-[#ff9f1c]"></span> points!</p>
+      <button onclick="proceedToNextLevel()" class="w-full bg-gradient-to-r from-[#ff9f1c] to-[#f76c6f] text-white py-4 rounded-3xl dzongkha text-2xl font-bold">འཕྲོ་མཐུད། Continue ➡️</button>
+    </div>
+  </div>
+
+  <!-- Final Screen -->
+  <div id="finalComplete" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[400]">
+    <div class="bg-white text-slate-800 p-12 rounded-3xl max-w-md w-full text-center shadow-2xl">
+      <div class="text-6xl mb-6">🎉</div>
+      <h2 class="dzongkha text-4xl font-bold mb-4 text-[#ff6b00]">བཀྲིས་བདེ་ལེགས།<br>རྩེདམོ་ཆ་ཚང་རྫོགས་སོ།།</h2>
+      <p class="dzongkha text-2xl mb-8">You scored <span id="final-score" class="font-bold text-[#ff9f1c]"></span> points!</p>
+      <div class="flex flex-col gap-4">
+        <button onclick="continueWithActivity()" class="w-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white py-4 rounded-3xl dzongkha text-2xl font-bold">འཕྲོ་མཐུད་འབྲི་ནི། Continue with Activity</button>
+        <button onclick="restartFromLevel1()" class="w-full bg-gradient-to-r from-[#ff9f1c] to-[#f76c6f] text-white py-4 rounded-3xl dzongkha text-2xl font-bold">ལོག་འགོ་བཙུགས། Play Game Again</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reflection Page -->
+  <div id="reflectionPage" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[500]">
+    <div class="bg-white text-slate-800 p-12 rounded-3xl max-w-lg w-full text-center shadow-2xl">
+      <h2 class="dzongkha text-4xl font-bold mb-6 text-violet-700">ད་རིས་ཁྱོད་ཀྱིས་ག་ཅི་ཤེས་ཡོད་ན་བྲིས།</h2>
+      <textarea id="reflectionText" class="w-full h-48 p-6 dzongkha text-xl border-4 border-violet-300 rounded-3xl focus:border-violet-600 focus:outline-none" placeholder="འདི་ནང་བྲིས་..."></textarea>
+      <div class="flex gap-4 mt-8">
+        <button onclick="submitReflection()" class="flex-1 bg-gradient-to-r from-violet-600 to-indigo-600 text-white py-4 rounded-3xl dzongkha text-2xl font-bold">སྤྲོད། Submit</button>
+        <button onclick="restartFromLevel1()" class="flex-1 bg-gradient-to-r from-[#ff9f1c] to-[#f76c6f] text-white py-4 rounded-3xl dzongkha text-2xl font-bold">ལོག་འགོ་བཙུགས། Play Again</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quiz Modals -->
+  <div id="quizLevel1" class="hidden fixed inset-0 flex items-center justify-center z-[1000]">
+    <div class="bg-white p-6 rounded-3xl max-w-[380px] w-[92%] shadow-2xl border-t-8 border-[#ff9f1c]">
+      <h2 class="dzongkha text-center font-bold text-[#ff6b00] text-2xl mb-6" id="quiz1-title">སྒྲ་གཟུང་གི་དྲི་བའི་ལན་གདམ་ཁ་རྐྱབ།</h2>
+      <div id="optionsLevel1" class="grid gap-3"></div>
+    </div>
+  </div>
+
+  <div id="quizLevel2" class="hidden fixed inset-0 flex items-center justify-center z-[1000]">
+    <div class="bg-white p-6 rounded-3xl max-w-[380px] w-[92%] shadow-2xl border-t-8 border-emerald-500">
+      <h2 class="dzongkha text-center font-bold text-emerald-600 text-2xl mb-6" id="quiz2-title">དྲི་བའི་ལན་གདམ་ཁ་རྐྱབ།</h2>
+      <div id="optionsLevel2" class="grid gap-3"></div>
+    </div>
+  </div>
+
+  <div id="quizLevel3" class="hidden fixed inset-0 flex items-center justify-center z-[1000]">
+    <div class="bg-white p-6 rounded-3xl max-w-[380px] w-[92%] shadow-2xl border-t-8 border-violet-600">
+      <h2 class="dzongkha text-center font-bold text-violet-600 text-2xl mb-6" id="quiz3-title">ཁྱོད་ཀྱིས་ མཐོང་མི་འདི་ ཡིག་ཐོག་ལུ་བྲིས།</h2>
+      <div id="optionsLevel3" class="space-y-4"></div>
+    </div>
+  </div>
+
+  <div id="quizLevel4" class="hidden fixed inset-0 flex items-center justify-center z-[1000]">
+    <div class="bg-white p-6 rounded-3xl max-w-[420px] w-[92%] shadow-2xl border-t-8 border-blue-600">
+      <h2 class="dzongkha text-center font-bold text-blue-700 text-2xl mb-6" id="quiz4-title">དྲི་བ་<span id="question-number">1</span>/10</h2>
+      <div id="questionText" class="dzongkha text-xl text-center mb-8 min-h-[80px]"></div>
+      <div id="optionsLevel4" class="space-y-3"></div>
+    </div>
+  </div>
+
+  <!-- Audio -->
+  <audio id="introMusic" loop>
+    <source src="sounds/introsound.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="bgMusic" loop><source src="sounds/bgsound.mp3" type="audio/mpeg"></audio>
+  <audio id="whipSound"><source src="sounds/whip.mp3" type="audio/mpeg"></audio>
+  <audio id="level2Music" loop><source src="sounds/level2bg.mp3" type="audio/mpeg"></audio>
+  <audio id="level4Music" loop><source src="sounds/level4bg.mp3" type="audio/mpeg"></audio>
+
+  <script>
+    // ====================== SCROLLBAR FIX ======================
+    let scrollbarWidth = 0;
+
+    function getScrollbarWidth() {
+      const outer = document.createElement('div');
+      outer.style.visibility = 'hidden';
+      outer.style.overflow = 'scroll';
+      document.body.appendChild(outer);
+      const inner = document.createElement('div');
+      outer.appendChild(inner);
+      scrollbarWidth = outer.offsetWidth - inner.offsetWidth;
+      outer.parentNode.removeChild(outer);
+      return scrollbarWidth;
+    }
+
+    // ====================== INTRO + STORY FLOW ======================
+    const introMusic = document.getElementById('introMusic');
+
+    function showIntroScreen() {
+      document.getElementById('introScreen').classList.remove('hidden');
+      if (introMusic) {
+        introMusic.volume = 0.45;
+        introMusic.currentTime = 0;
+        introMusic.play().catch(() => {
+          console.log("Intro music autoplay blocked - will start after first click");
+        });
+      }
+    }
+
+    function startFromIntro() {
+      if (introMusic) introMusic.pause();   // Stop intro music when leaving intro
+
+      const introContent = document.getElementById('introContent');
+      introContent.style.transition = 'all 0.6s ease-out';
+      introContent.style.transform = 'scale(0.95)';
+      introContent.style.opacity = '0';
+
+      setTimeout(() => {
+        document.getElementById('introScreen').classList.add('hidden');
+        introContent.style.transition = '';
+        introContent.style.transform = '';
+        introContent.style.opacity = '';
+        
+        document.getElementById('welcome').style.display = 'flex';
+      }, 600);
+    }
+
+    function startStoryToLevel1() {
+      const storyScreen = document.getElementById('storyScreen');
+      storyScreen.classList.add('fade-out');
+      setTimeout(() => {
+        storyScreen.classList.add('hidden');
+        storyScreen.classList.remove('fade-out');
+        showLevel1Intro();
+      }, 800);
+    }
+
+    function showStoryScreen() {
+      document.getElementById('storyScreen').classList.remove('hidden');
+    }
+
+    function showLevel1Intro() {
+      document.getElementById('level1Intro').classList.remove('hidden');
+    }
+    // ====================== GLOBALS ======================
+    const bgMusic = document.getElementById('bgMusic');
+    const level2Music = document.getElementById('level2Music');
+    const level4Music = document.getElementById('level4Music');
+
+    let points = 0;
+    let lives = 3;
+    let currentQuestion = 0;
+    let correctCount = 0;
+    let gameState = "IDLE";
+    let storyIndex = 0;
+    let openedBoxes = 0;
+    let nextLevelNumber = 2;
+    let currentObj = null;
+    let canClickBoxes = true;
+    let currentFoundImage = null;
+    let currentAudio = null;
+    let level3Index = 0;
+    let level4Index = 0;
+    let level4Score = 0;
+
+    bgMusic.volume = 0.35;
+    level2Music.volume = 0.35;
+    level4Music.volume = 0.35;
+
+    // ====================== DATA ======================
+    const storyFlow = [
+      { speaker: "boy", text: "སྐུ་གཟུགས་བཟང་པོ་ལགས། (Hello!)" },
+      { speaker: "shop", text: "སྐུ་གཟུགས་བཟང་པོ། ག་དེམ་ཅིག་སྦེ་ བྱོན་ཡི།?" },
+      { speaker: "boy", text: "ནཱ་ལུ་ ཡི་གུའི་སྡེབ་ཤེས་པ་ཅིན་ གསོལ་ར་འཐོབ་ཟེར་གོ་ཡི། བདེན་ག་སྨོ?" },
+      { speaker: "shop", text: "ཨིན་ ཨིན། དྲི་བ་གསུམ་གྱི་ལན་ཕོག་པ་ཅིན་ འཐོབ།" },
+      { speaker: "boy", text: "སྤའོ་་་ དགའ་བས་སྟེ། ང་ལན་རྐྱབ་གེ་ལགས།" },
+      { speaker: "shop", text: "ཡ་་དེནི་ ཁྱོད་གྲ་གྲིག་ཨིན་ན? དྲི་བ་ལེགས་ལེགས་ཤོམ་སྦེ་ཉན་ཤིག།" }
+    ];
+
+    const questions = [
+      { dialogue: "དྲི་བ་༡། སྒྲ་གཟུང་ཉན་་་་་་་་?", audio: "sounds/audio1.mp3", options: ["བཀའ་", "དཀའ་", "མཀའ་", "བརྐ་"], answer: 0 },
+      { dialogue: "དྲི་བ་༢། སྒྲ་གཟུང་ཉན་་་་་་་་?", audio: "sounds/audio2.mp3", options: ["བཀའ་", "དཀའ་", "ཀཱ", "མཀའ་"], answer: 1 },
+      { dialogue: "དྲི་བ་༣། སྒྲ་གཟུང་ཉན་་་་་་་་?", audio: "sounds/audio3.mp3", options: ["སྐ་", "བསྐ་", "རྐ་", "བརྐ་"], answer: 2 }
+    ];
+
+    const searchLevels = [
+      { name: "༼སྐུ༽", img: "images/buddha_statue.png", reading: "འདི་ སངས་རྒྱས་ཀྱི་སྐུ་ཨིན་པས། འདི་ 'སྐུ' ཟེར་བྲི་དགོ། འདི་ང་བཅས་ཀྱི་གཟུགས་ཟེར་མི་གི་ ཞེ་སའི་ཚིག་ཡང་ཨིན། ཚིག་འདི་ 'རྐུ' ཟེར་མི་དང་ འཛོལ་ནིའི་ཉེན་ཁ་ཡོད།", quiz: { dialogue: "སྐུ་ཟེར་མི་འདི་ ག་ཅི་ཨིན་ལོ?", options: ["ཨརཝ་བརྐུ་ནི།", "རྩིགཔ་ཟ་ནི།", "གཟུགས་ཀྱི་ཞེ་ས།", "ལགཔ་གི་ཞེ་ས།"], answer: 2 } },
+      { name: "༼རྐུ༽ ", img: "images/wordku.png", reading: "འདི་ 'རྐུ' ཟེར་བའི་ཡི་གུ་ཨིན་པས། རྐུ་ཟེར་མི་འདི་ 'སྦྱིན་བདག་ལས་གནང་བ་མེད་པར་ འཐུ་འབག་ནི་ནི་ལུ་' གོཝ་ཨིན། ང་བཅས་ཀྱི་ ཨརཝ་རྐུ་ནི་ཟེར་སླབ་ནི་ཡོད་མེན་ན? འ་ནཱི་ཨིན། འདི་བྲིཝ་ད་ 'རྐུ' ཟེར་བྲི་དགོ།", quiz: { dialogue: "ཅ་ལ་གཅིག་ སྦྱིན་བདག་གི་གནང་བ་མེད་པར་ འབག་པ་ཅིན་ ག་དེ་སྦེ་ བྲི་འོང་?", options: ["ཨརཝ་འབད་དེས།", "ཨརཝ་སྐུ་དེས།", "ཨརཝ་ཀུ་དེས།", "ཨརཝ་རྐུ་དེས།"], answer: 3 } },
+      { name: "༼སྐར་མ་༽", img: "images/star.png", reading: "འདི་ ཡར་གནམ་ཁའི་སྐརམ་(Star)ཟེར་མི་འདི་ཨིན་པས། འདི་ཡིག་ཐོག་ལུ་འབྲིཝ་ད་ 'སྐར་མ་' ཟེར་བྲི་དགོ། དོ་རུང་ མི་གི་མིང་ 'ཀརྨ' ཟེར་མི་དང་ འཛོལ་ནི་མི་འོང་། ", quiz: { dialogue: "STAR ཟེར་མི་འདི་ རྫོང་ཁ་ནང་ག་དེ་སྦེ་ བྲི་དགོ་ལོ་?", options: ["ཀར་མ་", "སྐར་མ་", "དཀར་མ་", "བསྐར་མ།"], answer: 1 } }
+    ];
+
+    const level3Data = [
+      { image: "images/washing.gif", question: "མོ་ག་ཅི་འབདཝ་ཨིན་ན།", correct: "བསྐམ་", explanation: "འདི་གོ་ལ་བསྐམ་པའི་མཐོང་སྣང་ཨིན་པས། འདི་འབྲིཝ་ད་ 'བསྐམ་' ཟེར་བྲི་དགོ།" },
+      { image: "images/pouring.gif", question: "འདི་ ག་ཅི་འབདཝ་མས?", correct: "བཀང་", explanation: "ཧོད་ནང་ལུ་ཆུ་བཀང་དེས། འབྲིཝ་ད་ 'བཀང་' ཟེར་བྲི་དགོ། མདའ་གཞུ་གུར་བཀང་ནི་ཡང་ ཡིག་སྡེབ་དེ་སྦེ་ར་བྲི་དགོ།" },
+      { image: "images/stretching.gif", question: "ཁོང་གཉིས་ག་ཅི་འབད་དེས?" , correct: "བརྐྱང་", explanation: "ཁོང་གཉིས་ཀྱིས་རྐངམ་བརྐྱང་དེས། ལག་བརྐྱང་ནི་ཡང་ཅོག་ར་གཅིག། དེ་འབདཝ་ད་ བཀྲིན་བསྐྱང་ནི་ཟེར་མི་ཚུ་ 'བསྐྱང་' ཟེར་བྲི་དགོ། དེ་ཚུ་བརྗོད་སྒྲ་འདྲ་རུང་ ཡིག་སྡེབ་མི་འདྲ།" },
+      { image: "images/chopwood.gif", question: "ཁོ་ག་ཅི་འབད་དེས?", correct: "བཀག་", explanation: "ཁོ་ ་ཤིང་བཀག་དེས། ལམ་བཀག་ནི་ལུ་ཡང་དེ་སྦེ་ར་བྲི་དགོ། དེ་ལས་རོགས་ལུ་ དགག་པ་རྐྱབ་ད་ཡང་ 'བཀག་རྐྱབ་མས' ཟེར་ཡང་སླབ་སྲོལ་ཡོད།" },
+      { image: "images/stopcar.jpg", question: "འདི་ག་ཅི་གི་པར་སྨོ?", correct: "བཀག་", explanation: "ཁོ་ སྣུམ་འཁོར་བཀག་དེས། ད་ཅི་སླབ་དོ་བཟུམ་སྦེ་ ཤིང་བཀག་ནི་ལུ་ཡང་ དེ་སྦེ་ར་བྲི་འོང་། དེ་ཚུ་སེམས་ཁར་བཞག་དགོ་སྨ་རེད།" }
+    ];
+
+    const assessmentQuestions = [
+      { type: "tf", question: "རྐུ་ཟེར་མི་འདི་ སྦྱིན་བདག་གི་གནང་བ་མེད་པར་ ཅ་ལ་འཐུ་འབག་ནི་ལུ་གོ་དགོ།", answer: true },
+      { type: "fill", question: "______ ཟེར་མི་འདི་ལུས་ཀྱི་ཞེ་ས་ཨིན།", answer: "སྐུ" },
+      { type: "tf", question: "ཕྱི་རུ་གནམ་ཁར་ཤར་མི་འདི་ དཀར་མ་ ཨིན།?", answer: false },
+      { type: "fill", question: "གོ་ལ་ འདི་ཉིམ་ན་ ______ དགོ། (བརྐམ་ བསྐམ་ བཀམ་)", answer: "བསྐམ" },
+      { type: "tf", question: "'བསྐང་'དང་'བཀང་'གཉིས་དོན་དག་མི་འདྲ།", answer: true },
+      { type: "fill", question: "འཕྲལ་འཕྲལ་ རྐངམ་དང་ལགཔ་ ______དགོ། (བསྐྱང་། བརྐྱང་། ཀྱང་)", answer: "བརྐྱང" },
+      { type: "tf", question: "'ཤིང་བཀག་ནི་'དང་ 'ལམ་བཀག་ནི་' ཟེརཝ་ད་ ཡིག་སྡེབ་གཅིག་ར་ཨིན།", answer: true },
+      { type: "mcq", question: "ཁོ་གིས་ལམ་ཁར་ སྣུམ་འཁོར་ ______།", options: ["བསྐམ་དེས།", "བཀང་དེས།", "བརྐྱང་དེས།", "བཀག་དེས།"], answer: 3 },
+      { type: "fill", question: "ལུས་རྩལ་འབདཝ་ད་ རྐངམ་དང་ལགཔ་ ______དགོ། (བསྐྱང་། བརྐྱང་། ཀྱང་)", answer: "བརྐྱང" },
+      { type: "tf", question: "'སྐུ་'དང་'རྐུ་'གཉིས་ཀྱི་དོན་དག་གཅིག་ཨིན་པས།", answer: false }
+    ];
+
+    // ====================== HELPER FUNCTIONS ======================
+    function showBubble(who, text) {
+      document.getElementById('boy-bubble').classList.add('hidden');
+      document.getElementById('shop-bubble').classList.add('hidden');
+      document.getElementById(`${who}-bubble`).classList.remove('hidden');
+      document.getElementById(`${who}-text`).innerText = text;
+    }
+
+    function createReward() {
+      const r = document.createElement('div');
+      r.className = 'reward';
+      r.innerText = '🎁';
+      r.style.left = '50%';
+      r.style.bottom = '150px';
+      document.getElementById('world').appendChild(r);
+      setTimeout(() => r.remove(), 2000);
+    }
+
+    function hideAllQuizzes() {
+      document.getElementById('quizLevel1').classList.add('hidden');
+      document.getElementById('quizLevel2').classList.add('hidden');
+      document.getElementById('quizLevel3').classList.add('hidden');
+      document.getElementById('quizLevel4').classList.add('hidden');
+    }
+
+    function resetScoreOnWrong() {
+      points = 0;
+      document.getElementById('score').innerText = '0';
+    }
+
+    function resetAllVariables() {
+      points = 0; lives = 3; storyIndex = 0; openedBoxes = 0; currentQuestion = 0; correctCount = 0;
+      level3Index = 0; level4Index = 0; level4Score = 0;
+      gameState = "IDLE";
+      document.getElementById('level').innerText = "Level 1";
+      document.getElementById('score').innerText = '0';
+      document.getElementById('lives').innerText = '3';
+    }
+
+    // ====================== START GAME ======================
+    function startGame() {
+      const welcome = document.getElementById('welcome');
+      welcome.classList.add('fade-out');
+      setTimeout(() => {
+        welcome.style.display = 'none';
+        welcome.classList.remove('fade-out');
+        showStoryScreen();
+      }, 800);
+    }
+
+    // ====================== LEVEL 1 ======================
+    // stop intro music
+if (introMusic) introMusic.pause();
+
+// start background music
+if (bgMusic) {
+  bgMusic.currentTime = 0;
+  bgMusic.volume = 0.35;
+  bgMusic.play().catch(() => {});
+}
+           function startLevel1() {
+      document.getElementById('level1Intro').classList.add('hidden');
+      document.getElementById('level').innerText = "Level 1";
+
+      // STOP INTRO MUSIC
+      if (introMusic) {
+        introMusic.pause();
+        introMusic.currentTime = 0;
+      }
+
+      // START BACKGROUND MUSIC
+      const bgMusic = document.getElementById('bgMusic');
+      if (bgMusic) {
+        bgMusic.currentTime = 0;
+        bgMusic.volume = 0.35;
+        bgMusic.play().catch(() => {});
+      }
+
+      gameState = "QUIZ";
+      currentQuestion = 0;
+      correctCount = 0;
+      setupAudioQuestion();
+    }
+
+    function setupAudioQuestion() {
+      if (currentQuestion >= questions.length) return;
+      const q = questions[currentQuestion];
+      showBubble('shop', q.dialogue + " 🎤");
+      const nextBtn = document.getElementById('nextBtn');
+      nextBtn.innerHTML = '▶️ སྒྲ་ཉན། Play Audio';
+      nextBtn.onclick = playCurrentAudio;
+      hideAllQuizzes();
+    }
+
+    function playCurrentAudio() {
+      const q = questions[currentQuestion];
+      if (currentAudio) currentAudio.pause();
+      currentAudio = new Audio(q.audio);
+      currentAudio.play();
+      setTimeout(() => showOptionsForCurrentQuestion(), 800);
+    }
+
+    function showOptionsForCurrentQuestion() {
+      const quizBoard = document.getElementById('quizLevel1');
+      quizBoard.classList.remove('hidden');
+      const optionsDiv = document.getElementById('optionsLevel1');
+      optionsDiv.innerHTML = '';
+      questions[currentQuestion].options.forEach((opt, index) => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.className = "dzongkha bg-[#ff9f1c] hover:bg-orange-600 text-white px-8 py-5 rounded-3xl text-2xl font-bold w-full transition-transform";
+        btn.onclick = () => checkAnswer(index);
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selectedIndex) {
+      const q = questions[currentQuestion];
+      const isCorrect = selectedIndex === q.answer;
+      if (isCorrect) {
+        correctCount++;
+        points += 10;
+        document.getElementById('score').innerText = points;
+        showBubble('shop', "ལེགས་སོ། ཁྱོད་ཀྱིས་ཤེས་ནུག།");
+      } else {
+        showBubble('shop', "ལན་མ་ཕོག། སྒྲ་ལོག་ཉན།");
+        resetScoreOnWrong();
+        lives--;
+        document.getElementById('lives').innerText = lives;
+        if (lives <= 0) { hideAllQuizzes(); return; }
+      }
+      currentQuestion++;
+      if (correctCount >= 3) {
+        setTimeout(() => { hideAllQuizzes(); goToNextShop(); }, 1400);
+      } else if (currentQuestion < questions.length) {
+        setTimeout(() => { hideAllQuizzes(); setupAudioQuestion(); }, 1600);
+      }
+    }
+
+    // ====================== COMMON PROGRESSION ======================
+    function goToNextShop() {
+      document.getElementById('normal-score').innerText = points;
+      document.getElementById('normalComplete').classList.remove('hidden');
+    }
+
+    function proceedToNextLevel() {
+      document.getElementById('normalComplete').classList.add('hidden');
+      if (nextLevelNumber === 2) document.getElementById('level2Intro').classList.remove('hidden');
+      else if (nextLevelNumber === 3) document.getElementById('level3Intro').classList.remove('hidden');
+      else if (nextLevelNumber === 4) document.getElementById('level4Intro').classList.remove('hidden');
+    }
+
+    // ====================== LEVEL 2 ======================
+    function startLevel2() {
+      document.getElementById('level2Intro').classList.add('hidden');
+      document.getElementById('level').innerText = "Level 2";
+      bgMusic.pause();
+      level2Music.play().catch(() => {});
+      const world = document.getElementById('world');
+      const boxes = document.getElementById('searchBoxes');
+      world.style.animation = "none";
+      world.classList.add('level2-bg');
+      boxes.classList.remove('hidden');
+      const player = document.getElementById('player');
+      player.classList.add('walking');
+      player.style.left = "25%";
+      gameState = "SEARCHING";
+      openedBoxes = 0;
+      canClickBoxes = true;
+      currentFoundImage = null;
+      showBubble('shop', "སྒྲོམ་ནང་ག་ཅི་འདུག་ག་བལྟ།");
+    }
+
+    function startSearch(boxNumber) {
+      if (!canClickBoxes) return;
+      canClickBoxes = false;
+      const player = document.getElementById('player');
+      const boxes = document.querySelectorAll('#searchBoxes img');
+      const targetBox = boxes[boxNumber - 1];
+      player.classList.add('walking');
+      player.style.left = targetBox.style.left || "40%";
+      setTimeout(() => {
+        player.classList.remove('walking');
+        revealObject(boxNumber);
+      }, 1600);
+    }
+
+    function revealObject(boxNumber) {
+      const obj = searchLevels[boxNumber - 1];
+      currentObj = obj;
+      const world = document.getElementById('world');
+      const selectedBox = document.querySelectorAll('#searchBoxes img')[boxNumber - 1];
+      selectedBox.style.transition = "all 0.8s";
+      selectedBox.style.opacity = "0";
+      selectedBox.style.pointerEvents = "none";
+      const rect = selectedBox.getBoundingClientRect();
+      const worldRect = world.getBoundingClientRect();
+      const left = rect.left - worldRect.left;
+      const top = rect.top - worldRect.top;
+      const found = document.createElement('img');
+      found.src = obj.img;
+      found.className = "absolute w-40 md:w-52 lg:w-56 object-pop";
+      found.style.left = left + "px";
+      found.style.top = top + "px";
+      found.style.zIndex = "500";
+      world.appendChild(found);
+      currentFoundImage = found;
+      showBubble('boy', "འདི་ག་ཅི་ཨིན་ན?");
+      const nextBtn = document.getElementById('nextBtn');
+      nextBtn.style.display = "block";
+      nextBtn.innerHTML = 'འཕྲོ་མཐུད། Next ➡️';
+      nextBtn.onclick = () => step1_Explain(obj);
+    }
+
+    function step1_Explain(obj) {
+      showBubble('shop', obj.name + " " + obj.reading);
+      const nextBtn = document.getElementById('nextBtn');
+      nextBtn.onclick = () => step2_AskUnderstanding(obj);
+    }
+
+    function step2_AskUnderstanding(obj) {
+      showBubble('shop', "ཁྱོད་ཀྱིས་ཧ་གོ་ཡི་ག?");
+      const boyBubble = document.getElementById('boy-bubble');
+      const boyText = document.getElementById('boy-text');
+      boyBubble.classList.remove('hidden');
+      boyText.innerHTML = `
+        <div class="dzongkha text-center space-y-4 py-2">
+          <div class="text-2xl mb-4">ཧ་གོ་ཡི་ག?</div>
+          <div class="flex justify-center gap-8">
+            <button onclick="handleYes()" class="bg-green-600 hover:bg-green-700 text-white px-10 py-4 rounded-3xl text-2xl font-bold shadow-md transition-all">ཧ་གོ་ཡི།</button>
+            <button onclick="handleNo()" class="bg-red-600 hover:bg-red-700 text-white px-10 py-4 rounded-3xl text-2xl font-bold shadow-md transition-all">ཧ་མ་གོ།</button>
+          </div>
+        </div>
+      `;
+      document.getElementById('nextBtn').style.display = 'none';
+    }
+
+    function handleYes() {
+      document.getElementById('boy-bubble').classList.add('hidden');
+      showBubble('shop', currentObj.quiz.dialogue);
+      setTimeout(() => setupObjectQuiz(currentObj.quiz), 900);
+    }
+
+    function handleNo() {
+      document.getElementById('boy-bubble').classList.add('hidden');
+      showBubble('shop', currentObj.name + "། " + currentObj.reading);
+      const nextBtn = document.getElementById('nextBtn');
+      nextBtn.style.display = 'block';
+      nextBtn.innerHTML = 'འཕྲོ་མཐུད། Next ➡️';
+      nextBtn.onclick = () => step2_AskUnderstanding(currentObj);
+    }
+
+    function setupObjectQuiz(quizData) {
+      const quiz = document.getElementById('quizLevel2');
+      const optionsDiv = document.getElementById('optionsLevel2');
+      quiz.classList.remove('hidden');
+      optionsDiv.innerHTML = '';
+      quizData.options.forEach((opt, index) => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.className = "dzongkha bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-5 rounded-3xl text-2xl font-bold w-full transition-transform";
+        btn.onclick = () => checkObjectAnswer(index, quizData);
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function checkObjectAnswer(selectedIndex, quizData) {
+      const isCorrect = selectedIndex === quizData.answer;
+      if (isCorrect) {
+        points += 15;
+        document.getElementById('score').innerText = points;
+        showBubble('shop', "ལེགས་སོ།");
+        createReward();
+      } else {
+        showBubble('shop', "ལོག་ཚར་གཅིག་བལྟ།");
+        resetScoreOnWrong();
+      }
+      hideAllQuizzes();
+      if (currentFoundImage) {
+        currentFoundImage.style.transition = "opacity 1s";
+        currentFoundImage.style.opacity = "0";
+        setTimeout(() => { if (currentFoundImage) currentFoundImage.remove(); currentFoundImage = null; }, 1000);
+      }
+      openedBoxes++;
+      if (openedBoxes >= 3) {
+        setTimeout(finishLevel2, 1200);
+      } else {
+        showBubble('shop', "སྒྲོམ་ནང་ག་ཅི་འདུག་ག་བལྟ།");
+        canClickBoxes = true;
+      }
+    }
+
+    function finishLevel2() {
+      level2Music.pause();
+      bgMusic.play().catch(() => {});
+      const player = document.getElementById('player');
+      player.classList.add('walking');
+      player.style.left = "15%";
+      setTimeout(() => {
+        player.classList.remove('walking');
+        showBubble('shop', "ལེགས་སོ། ཁྱོད་ཀྱིས་ཅ་ལ་ཆ་ཚང་ཐོབ་ཅི། དེའི་སྡེབ་དང་དོན་ཡང་ཤེས་ཅི།");
+        setTimeout(() => { nextLevelNumber = 3; goToNextShop(); }, 1500);
+      }, 1500);
+    }
+
+    // ====================== LEVEL 3 ======================
+    function startLevel3() {
+      document.getElementById('level3Intro').classList.add('hidden');
+      document.getElementById('level').innerText = "Level 3";
+      gameState = "LEVEL3";
+      level3Index = 0;
+      showBubble('shop', "ད་གནས་རིམ་གསུམ་པ་ནང་ལྷོད་ཅི། མིག་ཏོ་གི་ལེགས་ཤོམ་སྦེ་བལྟ་དགོ།");
+      setTimeout(() => loadLevel3Scene(0), 1400);
+    }
+
+    function loadLevel3Scene(index) {
+      const data = level3Data[index];
+      const old = document.getElementById('level3Scene');
+      if (old) old.remove();
+      const world = document.getElementById('world');
+      const img = document.createElement('img');
+      img.src = data.image;
+      img.id = "level3Scene";
+      img.className = "absolute bottom-28 left-1/2 -translate-x-1/2 w-80 md:w-96 object-pop shadow-2xl";
+      world.appendChild(img);
+      showBubble('shop', "ཁོ་ག་ཅི་འབད་དེས? What is he doing?");
+      const nextBtn = document.getElementById('nextBtn');
+      nextBtn.style.display = "block";
+      nextBtn.innerHTML = 'འཕྲོ་མཐུད། Next ➡️';
+      nextBtn.onclick = () => showExplanationAndAudio(data);
+    }
+
+    function showExplanationAndAudio(data) {
+      showBubble('shop', data.explanation || "འདི་ " + data.correct + " ཟེར་བྲི་དགོ།");
+      const nextBtn = document.getElementById('nextBtn');
+      nextBtn.style.display = "block";
+      nextBtn.innerHTML = 'དྲི་བའི་ལན་རྐྱབ། Answer Now ➡️';
+      nextBtn.onclick = () => {
+        showBubble('shop', data.question);
+        showLevel3TypingInput(data);
+        nextBtn.style.display = "none";
+      };
+    }
+
+    function showLevel3TypingInput(data) {
+      const quiz = document.getElementById('quizLevel3');
+      const container = document.getElementById('optionsLevel3');
+      quiz.classList.remove('hidden');
+      container.innerHTML = `
+        <input id="answerBox" class="w-full p-4 text-xl dzongkha rounded-3xl border-4 border-violet-300 focus:border-violet-600 text-center focus:outline-none" placeholder="འདི་ནང་བྲིས་..." autocomplete="off">
+        <button onclick="checkLevel3Answer()" class="w-full mt-6 bg-gradient-to-r from-violet-600 to-indigo-600 text-white py-4 rounded-3xl text-2xl font-bold hover:scale-105 transition-transform">སྤྲོད། Submit</button>
+      `;
+      setTimeout(() => document.getElementById('answerBox').focus(), 300);
+    }
+
+    function checkLevel3Answer() {
+      const input = document.getElementById('answerBox').value.trim();
+      const data = level3Data[level3Index];
+      if (!input) { showBubble('shop', "ཡིག་གྲངས་བྲིས་གནང་།"); return; }
+      const playerAnswer = input.toLowerCase();
+      const correctMainWord = data.correct.toLowerCase();
+      const isCorrect = playerAnswer.includes(correctMainWord);
+      if (isCorrect) {
+        points += 15;
+        document.getElementById('score').innerText = points;
+        showBubble('shop', "ལེགས་སོ། " + data.correct);
+        createReward();
+        hideAllQuizzes();
+        level3Index++;
+        if (level3Index < level3Data.length) {
+          setTimeout(() => loadLevel3Scene(level3Index), 1400);
+        } else {
+          setTimeout(finishLevel3, 1600);
+        }
+      } else {
+        showBubble('shop', "ལོག་ཚར་གཅིག་བལྟ། གཙོ་བོའི་ཚིག་གི་སྡེབ་ལེགས་ཤོམ་སྦེ་བྲིས།");
+        resetScoreOnWrong();
+      }
+    }
+
+    function finishLevel3() {
+      const lastScene = document.getElementById('level3Scene');
+      if (lastScene) lastScene.remove();
+      nextLevelNumber = 4;
+      document.getElementById('normal-score').innerText = points;
+      document.getElementById('normalComplete').classList.remove('hidden');
+    }
+
+    // ====================== LEVEL 4 ======================
+    function startLevel4() {
+      document.getElementById('level4Intro').classList.add('hidden');
+      document.getElementById('level').innerText = "Level 4 - Assessment";
+      gameState = "LEVEL4";
+      level4Index = 0;
+      level4Score = 0;
+      bgMusic.pause();
+      level2Music.pause();
+      level4Music.play().catch(() => {});
+      document.getElementById('score').innerText = '0';
+      loadLevel4Question(0);
+    }
+
+    function loadLevel4Question(index) {
+      if (index >= assessmentQuestions.length) {
+        finishLevel4();
+        return;
+      }
+      level4Index = index;
+      const q = assessmentQuestions[index];
+      hideAllQuizzes();
+      const quiz = document.getElementById('quizLevel4');
+      quiz.classList.remove('hidden');
+      document.getElementById('question-number').innerText = (index + 1);
+      document.getElementById('questionText').innerHTML = q.question;
+      const optionsDiv = document.getElementById('optionsLevel4');
+      optionsDiv.innerHTML = '';
+      if (q.type === "tf") {
+        optionsDiv.innerHTML = `
+          <button onclick="checkLevel4Answer(true)" class="w-full py-5 text-2xl dzongkha bg-blue-500 hover:bg-blue-600 text-white rounded-3xl">བདེན་པ། True</button>
+          <button onclick="checkLevel4Answer(false)" class="w-full py-5 text-2xl dzongkha bg-blue-500 hover:bg-blue-600 text-white rounded-3xl">རྫུན་པ། False</button>
+        `;
+      } else if (q.type === "fill") {
+        optionsDiv.innerHTML = `
+          <input id="level4AnswerBox" class="w-full p-5 text-2xl dzongkha rounded-3xl border-4 border-blue-300 focus:border-blue-600 text-center" placeholder="འདི་ནང་བྲིས་...">
+          <button onclick="checkLevel4FillAnswer()" class="w-full mt-4 py-5 text-2xl dzongkha bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-3xl">སྤྲོད། Submit</button>
+        `;
+        setTimeout(() => document.getElementById('level4AnswerBox').focus(), 300);
+      } else if (q.type === "mcq") {
+        q.options.forEach((opt, i) => {
+          const btn = document.createElement('button');
+          btn.textContent = opt;
+          btn.className = "w-full py-5 text-2xl dzongkha bg-blue-500 hover:bg-blue-600 text-white rounded-3xl";
+          btn.onclick = () => checkLevel4Answer(i);
+          optionsDiv.appendChild(btn);
+        });
+      }
+    }
+
+    function checkLevel4Answer(selected) {
+      const q = assessmentQuestions[level4Index];
+      let isCorrect = false;
+      if (q.type === "tf") isCorrect = selected === q.answer;
+      else if (q.type === "mcq") isCorrect = selected === q.answer;
+      if (isCorrect) {
+        level4Score += 10;
+        document.getElementById('score').innerText = level4Score;
+        createReward();
+      }
+      level4Index++;
+      setTimeout(() => loadLevel4Question(level4Index), 1200);
+    }
+
+    function checkLevel4FillAnswer() {
+      const input = document.getElementById('level4AnswerBox').value.trim();
+      const q = assessmentQuestions[level4Index];
+      if (!input) return;
+      const isCorrect = input.includes(q.answer) || q.answer.includes(input);
+      if (isCorrect) {
+        level4Score += 10;
+        document.getElementById('score').innerText = level4Score;
+        createReward();
+      }
+      level4Index++;
+      setTimeout(() => loadLevel4Question(level4Index), 1200);
+    }
+
+    function finishLevel4() {
+      hideAllQuizzes();
+      level4Music.pause();
+      bgMusic.play().catch(() => {});
+      document.getElementById('final-score').innerText = level4Score;
+      document.getElementById('finalComplete').classList.remove('hidden');
+    }
+
+    // ====================== ACTIVITY & RESTART ======================
+    function continueWithActivity() {
+      document.getElementById('finalComplete').classList.add('hidden');
+      document.getElementById('reflectionPage').classList.remove('hidden');
+    }
+
+    function submitReflection() {
+      const text = document.getElementById('reflectionText').value.trim();
+      if (text) {
+        alert("བཀྲིས་བདེ་ལེགས། ཁྱོད་ཀྱིས་བྲིས་ཡོད་མི་འདི་ སློབ་དཔོན་འབད་སར་ལྷོད་འོང་།\n\n" + text);
+      }
+      restartFromLevel1();
+    }
+
+    function restartFromLevel1() {
+      document.getElementById('reflectionPage').classList.add('hidden');
+      document.getElementById('finalComplete').classList.add('hidden');
+      restartGame();
+    }
+
+    function restartGame() {
+      bgMusic.pause();
+      level2Music.pause();
+      level4Music.pause();
+      resetAllVariables();
+      document.getElementById('welcome').style.display = 'flex';
+      hideAllQuizzes();
+      document.getElementById('normalComplete').classList.add('hidden');
+      document.getElementById('finalComplete').classList.add('hidden');
+      document.getElementById('reflectionPage').classList.add('hidden');
+      const world = document.getElementById('world');
+      world.classList.remove('level4-bg');
+    }
+
+            function toggleMusic() {
+      const bg = document.getElementById('bgMusic');
+      const l2 = document.getElementById('level2Music');
+      
+      if (bg.paused && (l2 ? l2.paused : true)) {
+        bg.play().catch(() => {});
+        document.getElementById('musicBtn').innerText = '🎵';
+      } else {
+        bg.pause();
+        if (l2) l2.pause();
+        document.getElementById('musicBtn').innerText = '🔇';
+      }
+    }
+
+    // ====================== KEYBOARD SUPPORT ======================
+    document.addEventListener('click', startIntroMusicOnce, { once: true });
+
+function startIntroMusicOnce() {
+  if (introMusic) {
+    introMusic.volume = 0.5;
+    introMusic.currentTime = 0;
+    introMusic.play().catch(() => {});
+  }
+}
+  
+    document.addEventListener('keydown', function(e) {
+      if (document.getElementById('welcome').style.display === 'flex') return;
+      if (e.key === "ArrowRight" || e.key === "Right") {
+        e.preventDefault();
+        const nextBtn = document.getElementById('nextBtn');
+        if (nextBtn && nextBtn.style.display !== 'none') nextBtn.click();
+      }
+      if (e.key === "ArrowLeft" || e.key === "Left") {
+        e.preventDefault();
+        if (gameState === "LEVEL3" && !document.getElementById('quizLevel3').classList.contains('hidden')) {
+          hideAllQuizzes();
+          showBubble('shop', level3Data[level3Index].question);
+          setTimeout(() => showLevel3TypingInput(level3Data[level3Index]), 600);
+        } else if (gameState === "LEVEL4" && !document.getElementById('quizLevel4').classList.contains('hidden')) {
+          hideAllQuizzes();
+          loadLevel4Question(level4Index);
+        }
+      }
+      if (e.key === "Enter") {
+        if (gameState === "LEVEL3") {
+          const answerBox = document.getElementById('answerBox');
+          if (answerBox && !document.getElementById('quizLevel3').classList.contains('hidden')) checkLevel3Answer();
+        } else if (gameState === "LEVEL4") {
+          const answerBox = document.getElementById('level4AnswerBox');
+          if (answerBox && !document.getElementById('quizLevel4').classList.contains('hidden')) checkLevel4FillAnswer();
+        }
+      }
+    });
+
+    // ====================== START THE GAME ======================
+       window.addEventListener('load', () => {
+      getScrollbarWidth();
+      showIntroScreen();   // This will try to play intro music immediately
+    });
+  
+  </script>
+</body>
+</html>
